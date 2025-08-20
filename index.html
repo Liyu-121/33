@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI逛菜市场 答案之书</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6aab9c, #e5f0e4);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            color: #2c5c4e;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(60, 130, 110, 0.3);
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39, #8bc34a, #4caf50);
+        }
+        
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 12px;
+            font-size: 1.8rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, #2e7d32, #4caf50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            line-height: 1.3;
+        }
+        
+        .subtitle {
+            color: #558b2f;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+        
+        .ai-icon {
+            font-size: 2rem;
+            color: #4caf50;
+            margin-bottom: 8px;
+        }
+        
+        .input-area {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #a5d6a7;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+            transition: all 0.3s;
+            background-color: #f1f8e9;
+            color: #33691e;
+        }
+        
+        input:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        input::placeholder {
+            color: #81c784;
+            font-size: 0.95rem;
+        }
+        
+        button {
+            background: linear-gradient(to right, #43a047, #66bb6a);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 280px;
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+        }
+        
+        .answer-area {
+            background: linear-gradient(to bottom, #e8f5e9, #c8e6c9);
+            border-radius: 15px;
+            padding: 25px 15px;
+            margin-top: 25px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 3px dashed #81c784;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-area::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="100" height="100" fill="none"/><path d="M20,20 Q40,5 60,20 T100,20 M20,50 Q40,35 60,50 T100,50 M20,80 Q40,65 60,80 T100,80" stroke="%2381c784" stroke-width="2" fill="none" opacity="0.3"/></svg>');
+            opacity: 0.1;
+        }
+        
+        .answer-text {
+            font-size: 1.6rem;
+            color: #1b5e20;
+            font-weight: bold;
+            margin: 15px 0;
+            transition: opacity 0.5s, transform 0.5s;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            padding: 10px 15px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            line-height: 1.4;
+        }
+        
+        .vegetable-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .vegetable-icon {
+            font-size: 2.8rem;
+            margin-bottom: 8px;
+            transition: transform 0.5s;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .red-packet {
+            font-size: 1rem;
+            color: #9e9e9e;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 12px;
+            border-radius: 15px;
+            margin-top: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .red-packet.free {
+            color: #f44336;
+            font-weight: bold;
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes shine {
+            0% { box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(244, 67, 54, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); }
+        }
+        
+        footer {
+            margin-top: 35px;
+            color: #2e7d32;
+            font-size: 0.85rem;
+            text-align: center;
+            opacity: 0.8;
+            padding: 0 10px;
+            line-height: 1.4;
+        }
+        
+        .instructions {
+            background-color: #e8f5e9;
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 25px;
+            text-align: left;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .instructions h3 {
+            color: #2e7d32;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+        
+        .instructions h3 i {
+            margin-right: 8px;
+        }
+        
+        .instructions ul {
+            list-style-type: none;
+            padding-left: 5px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            padding-left: 25px;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        
+        .instructions li i {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: #4caf50;
+            font-size: 0.9rem;
+        }
+        
+        /* 针对小屏幕手机的额外调整 */
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            input {
+                padding: 14px 16px;
+                font-size: 0.95rem;
+            }
+            
+            button {
+                padding: 14px 25px;
+                font-size: 1rem;
+            }
+            
+            .answer-text {
+                font-size: 1.4rem;
+            }
+            
+            .vegetable-icon {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* 针对较大屏幕手机的优化 */
+        @media (min-width: 410px) and (max-width: 768px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            input {
+                padding: 17px 22px;
+            }
+            
+            button {
+                padding: 17px 40px;
+                font-size: 1.2rem;
+            }
+            
+            .answer-text {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* 横屏模式适配 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .input-area {
+                margin-bottom: 15px;
+            }
+            
+            .answer-area {
+                min-height: 120px;
+                padding: 15px 10px;
+                margin-top: 15px;
+            }
+            
+            .answer-text {
+                font-size: 1.4rem;
+                margin: 10px 0;
+            }
+            
+            .instructions {
+                padding: 12px;
+                margin-top: 15px;
+            }
+            
+            footer {
+                margin-top: 20px;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .vegetable-background {
+            position: absolute;
+            font-size: 8rem;
+            opacity: 0.03;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* 防止移动端输入框放大 */
+        @media (max-width: 768px) {
+            input {
+                font-size: 16px; /* 防止iOS缩放 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ai-icon">
+            <i class="fas fa-robot"></i>
+        </div>
+        <h1>AI逛菜市场 答案之书</h1>
+        <p class="subtitle">输入你的问题，让AI用菜市场的智慧为你解答</p>
+        
+        <div class="input-area">
+            <input type="text" id="question" placeholder="请输入你的问题...">
+            <button id="get-answer">
+                <i class="fas fa-search"></i> 获取答案
+            </button>
+        </div>
+        
+        <div class="answer-area">
+            <div class="vegetable-background">🥦</div>
+            <div class="vegetable-container">
+                <div class="vegetable-icon">🥬</div>
+                <div class="red-packet" id="red-packet" style="display: none;">红包信息</div>
+            </div>
+            <div class="answer-text">等待你的问题...</div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> 在心中思考你的问题，然后输入到上面的文本框中</li>
+                <li><i class="fas fa-check-circle"></i> 点击"获取答案"按钮，AI会从菜市场的智慧中为你寻找答案</li>
+                <li><i class="fas fa-check-circle"></i> 答案会随机显示，每次点击都会得到不同的建议</li>
+                <li><i class="fas fa-check-circle"></i> 每次获取答案都有机会获得随机红包奖励</li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 AI逛菜市场 答案之书 | 用AI和蔬菜的智慧解答人生疑惑</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionInput = document.getElementById('question');
+            const getAnswerButton = document.getElementById('get-answer');
+            const answerText = document.querySelector('.answer-text');
+            const vegetableIcon = document.querySelector('.vegetable-icon');
+            const vegetableBackground = document.querySelector('.vegetable-background');
+            const redPacketElement = document.getElementById('red-packet');
+            
+            // 答案库
+            const answers = [
+                "无需纠结", "努力就好", "别想了", "时机正好", "问题本身才是答案",
+                "会顺利的", "换个角度想想", "享受全力的付出", "制定计划", "你已经有了答案",
+                "会是完美的", "尽人事，听天命", "顺其自然", "也许吧", "需要努力一下",
+                "早点行动", "再等等呢", "情况马上会有变化", "放轻松", "别让它影响你", "不必勉强"
+            ];
+            
+            // 蔬菜图标
+            const vegetables = ["🥬", "🥦", "🥒", "🌽", "🍆", "🍅", "🥕", "🧅", "🧄", "🥔", "🌶️", "🫑"];
+            
+            // 红包类型
+            const redPackets = [
+                { text: "1元红包", probability: 0.5, className: "" },
+                { text: "2元红包", probability: 0.35, className: "" },
+                { text: "5元红包", probability: 0.1, className: "" },
+                { text: "恭喜免单", probability: 0.05, className: "free" }
+            ];
+            
+            // 获取随机答案
+            function getRandomAnswer() {
+                const randomIndex = Math.floor(Math.random() * answers.length);
+                return answers[randomIndex];
+            }
+            
+            // 获取随机蔬菜图标
+            function getRandomVegetable() {
+                const randomIndex = Math.floor(Math.random() * vegetables.length);
+                return vegetables[randomIndex];
+            }
+            
+            // 获取随机红包
+            function getRandomRedPacket() {
+                const random = Math.random();
+                let cumulativeProbability = 0;
+                
+                for (const packet of redPackets) {
+                    cumulativeProbability += packet.probability;
+                    if (random <= cumulativeProbability) {
+                        return packet;
+                    }
+                }
+                
+                // 默认返回1元红包
+                return redPackets[0];
+            }
+            
+            // 获取答案按钮点击事件
+            getAnswerButton.addEventListener('click', function() {
+                const question = questionInput.value.trim();
+                
+                if (question === '') {
+                    alert('请输入你的问题');
+                    return;
+                }
+                
+                // 显示加载效果
+                answerText.style.opacity = '0';
+                redPacketElement.style.display = 'none';
+                vegetableIcon.classList.add('pulse');
+                
+                setTimeout(() => {
+                    const answer = getRandomAnswer();
+                    const vegetable = getRandomVegetable();
+                    const bgVegetable = getRandomVegetable();
+                    const redPacket = getRandomRedPacket();
+                    
+                    // 更新答案和图标
+                    answerText.textContent = answer;
+                    vegetableIcon.textContent = vegetable;
+                    vegetableBackground.textContent = bgVegetable;
+                    
+                    // 更新红包信息
+                    redPacketElement.textContent = redPacket.text;
+                    redPacketElement.className = "red-packet " + redPacket.className;
+                    redPacketElement.style.display = 'block';
+                    
+                    // 添加动画效果
+                    answerText.classList.remove('fade-in');
+                    void answerText.offsetWidth; // 触发重排
+                    answerText.classList.add('fade-in');
+                    
+                    // 淡入效果
+                    answerText.style.opacity = '1';
+                    vegetableIcon.classList.remove('pulse');
+                    
+                    // 清空输入框
+                    questionInput.value = '';
+                    
+                    // 隐藏键盘（移动端）
+                    questionInput.blur();
+                }, 800);
+            });
+            
+            // 按回车键也可以提交问题
+            questionInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    getAnswerButton.click();
+                }
+            });
+            
+            // 防止移动端表单提交时的默认行为
+            document.addEventListener('touchstart', function() {}, {passive: true});
+        });
+    </script>
+</body>
+</html>
